@@ -123,6 +123,7 @@ p1<-ggplot(data=Weekly.Sex, aes(x=Week, y=Mean, group=Sex))+
   theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=30,face="bold"),
         legend.text=element_text(size=20, face="bold"), legend.title=element_text(size=26, face="bold"))+
+  scale_x_continuous(breaks=seq(from=18, to = 33, by = 1))+
   geom_line(aes(colour=Sex), position=position_dodge(w=0.2), size=2)+
   theme(legend.position="bottom")+
   ylab("Mean Daily Light (lx)")
@@ -130,7 +131,7 @@ p1<-ggplot(data=Weekly.Sex, aes(x=Week, y=Mean, group=Sex))+
 # Data analysis
 Ind.Summary1<-subset(Ind.Summary, Week!="17" & Week!="34")
 Ind.Summary1$Week<-as.factor(Ind.Summary1$Week)
-lm1<-lmer(Mean~Week+(1|sex)+(1|ID), data=Ind.Summary1)
+lm1<-lmer(Mean~sex+(1|Week)+(1|ID), data=Ind.Summary1)
 summary(lm1)
 em.m1<-emmeans(lm1, c("Week"))
 summary(em.m1)
@@ -209,6 +210,10 @@ ggplot(data=Prop.Sex, aes(x=Week, y=Mean, group=Sex))+
 # Daytime only
 Turtles.Dur.Daytime<-subset(Turtles.dur, format(datetime, "%H:%M:%S")<"21:22:00" & format(datetime, "%H:%M:%S")>"06:06:00")
 Turtles.dur.Daytime.Daily<-aggregate(Light~Wet.Dry+sex+ID+format(datetime, "%m-%d"), length, data=Turtles.Dur.Daytime)
+Turtles.dur.Daytime.Daily.mean<-aggregate(Light~Wet.Dry+sex+ID+format(datetime, "%m-%d"), mean, data=Turtles.Dur.Daytime)
+colnames(Turtles.dur.Daytime.Daily.mean)[5]<-"lx"
+Turtles.dur.Daytime.Daily<-cbind(Turtles.dur.Daytime.Daily, Turtles.dur.Daytime.Daily.mean$lx)
+colnames(Turtles.dur.Daytime.Daily)[6]<-"lx"
 
 Turtles.Wet.Daytime<-subset(Turtles.dur.Daytime.Daily, Wet.Dry=="wet")
 Turtles.Dry.Daytime<-subset(Turtles.dur.Daytime.Daily, Wet.Dry=="dry")
@@ -231,7 +236,48 @@ p2<-ggplot(data=Prop.Sex, aes(x=Week, y=Mean, group=Sex))+
   theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=30,face="bold"),
         legend.text=element_text(size=20, face="bold"), legend.title=element_text(size=26, face="bold"))+
+  scale_x_continuous(breaks=seq(from=18, to = 33, by = 1))+
   geom_line(aes(colour=Sex), position=position_dodge(w=0.2), size=2)+
   theme(legend.position="bottom")+
   ylab("Mean Proportion of Time Spent Dry")
 #ggsave(path=path, filename="WeeklyDry.png", height=14, width=20, plot=p2)
+
+Turtles.Dry.Daytime1<-subset(Turtles.Dry.Daytime, Week!="17" & Week!="34")
+lm3<-lmer(Prop~sex+(1|ID)+(1|Week), data=Turtles.Dry.Daytime1)
+summary(lm3)
+anova(lm3, type=3)
+
+## Only mean light levels when turtles are dry
+Dry.light<-aggregate(lx~sex+Week, mean, data=Turtles.Dry.Daytime)
+Dry.light.se<-aggregate(lx~sex+Week, st.err, data=Turtles.Dry.Daytime)
+Dry.light<-cbind(Dry.light, Dry.light.se$lx)
+colnames(Dry.light)<-c("Sex","Week","Mean","SE")
+Dry.light<-subset(Dry.light, Week!="17" & Week!="34")
+
+p3<-ggplot(data=Dry.light, aes(x=Week, y=Mean, group=Sex))+
+  annotate("rect", xmin=22.6, xmax=24.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="blue")+
+  annotate("rect", xmin=27.3, xmax=29.7, ymin=-Inf, ymax=Inf, alpha=0.2, fill="red")+
+  geom_errorbar(aes(ymin=Mean-SE, ymax=Mean+SE), width=.5, position=position_dodge(width=0.2))+
+  geom_point(aes(colour=Sex), size=7, position=position_dodge(width=0.2))+
+  theme_bw()+
+  theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=30,face="bold"),
+        legend.text=element_text(size=20, face="bold"), legend.title=element_text(size=26, face="bold"))+
+  scale_x_continuous(breaks=seq(from=18, to = 33, by = 1))+
+  geom_line(aes(colour=Sex), position=position_dodge(w=0.2), size=2)+
+  theme(legend.position="bottom")+
+  ylab("Mean Light While Dry (lx)")
+#ggsave(path=path, filename="DryLight.png", height=14, width=20, plot=p3)
+
+Turtles.Dry.Daytime1<-subset(Turtles.Dry.Daytime, Week!=17 & Week!=34)
+# Post nesting
+Turtles.Dry.Daytime2<-subset(Turtles.Dry.Daytime,  Week>24 & Week!=34)
+# Pre nesting
+Turtles.Dry.Daytime3<-subset(Turtles.Dry.Daytime,  Week<25 & Week!=17)
+
+Turtles.Dry.Daytime1$Week<-as.factor(Turtles.Dry.Daytime1$Week)
+Turtles.Dry.Daytime2$Week<-as.factor(Turtles.Dry.Daytime2$Week)
+Turtles.Dry.Daytime3$Week<-as.factor(Turtles.Dry.Daytime3$Week)
+lm4<-lmer(lx~sex+(1|ID)+(1|Week), data=Turtles.Dry.Daytime2)
+summary(lm4)
+anova(lm4, type=3)
