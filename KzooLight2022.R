@@ -1,4 +1,3 @@
-setwd("~/Desktop/Research/Side Projects/Turtle Light 2021/Turtle-Light")
 ## Packages ----
 library(tidyr)
 library(tidyverse)
@@ -6,6 +5,8 @@ library(ggplot2)
 library(lme4)
 library(lmerTest)
 library(emmeans)
+library(suncalc)
+library(lubridate)
 st.err = function(x) {sd(x)/sqrt(length(x))}
 path<-"/Users/ianclifton/Desktop/Research/Side Projects/Turtle Light 2021/Figures"
 
@@ -122,8 +123,29 @@ Turtles$sex<-as.factor(Turtles$sex)
 Turtles<-Turtles[,c(2,5,7,13,14,15)]
 Turtles$WetDry<-fct_recode(Turtles$Wet.Dry, "0"="wet", "1"="dry")
 
+## Filter by sunrise and sunset
+###there has to be easier code to create dataframe of dates.
+###I was trying to create a dataframe with all possible dates we would need
+start_date <- ymd("2021-05-01")
+end_date <- ymd("2022-6-28")
+dates<-seq(start_date, end_date,"days")
+df.dates<-data.frame(dates)
+### creates a sunrise and sunset column for each date from lat long
+dat2 <- distinct(df.dates, dates) %>%
+  with(., getSunlightTimes(date = dates,
+                           lat = 42.2, lon = -85.1, tz = 'America/New_York',
+                           keep = c('sunrise', 'sunset')))
+###created a straight date column that would match date column of dat2 df
+Turtles$date <- as.Date(Turtles$datetime)
+###then filter 
+Turtles.Day<-distinct(df.dates, dates) %>%
+  with(., getSunlightTimes(date = dates,
+                           lat = 42.2, lon = -85.1, tz = 'America/New_York',
+                           keep = c('sunrise', 'sunset')))%>% 
+  left_join(Turtles, dat2, by = "date") %>%
+  filter(sunrise <= datetime, datetime <= sunset)
 
-
+# I still need to remove observations without a light measurement.
 
 
 
