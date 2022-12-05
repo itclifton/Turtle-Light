@@ -7,6 +7,8 @@ library(lmerTest)
 library(emmeans)
 library(suncalc)
 library(lubridate)
+library(cowplot)
+library(ggpubr)
 st.err = function(x) {sd(x)/sqrt(length(x))}
 path<-"/Users/ianclifton/Desktop/Research- PhD to Present/Side Projects/Turtle Light 2021/Figures"
 
@@ -101,11 +103,13 @@ Marlo$sex<-"Female"
 Marlo$datetime<-as.POSIXct(strptime(Marlo$Adjusted.Local.Time, format("%Y-%m-%d %H:%M")))
 Marlo<-subset(Marlo, format(datetime, "%Y-%m-%d")<"2022-06-28" & format(datetime, "%Y-%m-%d")>"2021-04-30")
 
-Satan<-read.csv("SatanBroken.csv")
+Satan1<-read.csv("SatanBroken.csv")
+Satan2<-read.csv("Satan2.csv")
+Satan<-rbind(Satan1,Satan2)
 Satan$ID<-"Satan"
 Satan$sex<-"Male"
 Satan$datetime<-as.POSIXct(strptime(Satan$Adjusted.Local.Time, format("%Y-%m-%d %H:%M")))
-Satan<-subset(Satan, format(datetime, "%Y-%m-%d")<"2021-08-24" & format(datetime, "%Y-%m-%d")>"2021-05-22")
+Satan<-subset(Satan, format(datetime, "%Y-%m-%d")<"2022-05-25" & format(datetime, "%Y-%m-%d")>"2021-05-22")
 
 Ziggy<-read.csv("ZiggyDone.csv")
 Ziggy$ID<-"Ziggy"
@@ -471,7 +475,7 @@ p4<-ggplot(data=m4.coefs, aes(x=Week.Year, y=emmean, group=Sex))+
   xlab("Week")
 #ggsave("MeanLighF.jpg", plot=p4, width=18, height=10, path=path)
 
-# Medianlight per week- filtered
+# Median light per week- filtered
 m5<-lmer(Median.Light~Sex*Week.Year+(1|ID), data=Dry.Daily.Summary.Env.2021)
 summary(m5)
 anova(m5)
@@ -510,16 +514,192 @@ p5<-ggplot(data=m5.coefs, aes(x=Week.Year, y=emmean, group=Sex))+
   xlab("Week")
 #ggsave("MedianLighF.jpg", plot=p4, width=18, height=10, path=path)
 
-## Environmental correlations
-m6<-lmer(Proportion.Dry~Discharge.ft.s+Julien+(1|ID), data=Daily.Summary.Env.2021)
+# Fig 1- Combined full and dry and a second panel with proportion of time dry
+# Mean unfiltered
+m1.coef.com<-m1.coef[,1:4]
+colnames(m1.coef.com)<-c("Sex","Week","UnMean","UnMean.se")
+m1.coef.com$UnMean<-m1.coef.com$UnMean/1000
+m1.coef.com$UnMean.se<-m1.coef.com$UnMean.se/1000
+# Median unfiltered
+m2.coef.com<-m2.coef[,3:4]
+colnames(m2.coef.com)<-c("UnMedian","UnMedian.se")
+m2.coef.com$UnMedian<-m2.coef.com$UnMedian/1000
+m2.coef.com$UnMedian.se<-m2.coef.com$UnMedian.se/1000
+# Mean dry
+m4.coef.com<-m4.coef[,3:4]
+colnames(m4.coef.com)<-c("DryMean","DryMean.se")
+m4.coef.com$DryMean<-m4.coef.com$DryMean/1000
+m4.coef.com$DryMean.se<-m4.coef.com$DryMean.se/1000
+# Median dry
+m5.coef.com<-m5.coef[,3:4]
+colnames(m5.coef.com)<-c("DryMedian","DryMedian.se")
+m5.coef.com$DryMedian<-m5.coef.com$DryMedian/1000
+m5.coef.com$DryMedian.se<-m5.coef.com$DryMedian.se/1000
+# Proportion Dry
+m3.coef.com<-m3.coef[,3:4]
+colnames(m3.coef.com)<-c("PropDry","PropDry.se")
+
+# Combinded
+light.coef.com<-cbind(m1.coef.com,m2.coef.com,m4.coef.com,m5.coef.com,m3.coef.com)
+light.coef.com<-separate(light.coef.com, 'Week', paste("Week", 1:2, sep=""), sep=",", extra="drop")
+light.coef.com<-light.coef.com[,-3]
+colnames(light.coef.com)[2]<-"Week"
+
+p6<-ggplot(data=light.coef.com, aes(x=Week, y=UnMean, group=Sex))+
+  scale_x_discrete()+
+  theme_classic()+
+  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=3, y=48, fontface="bold", label="May", size=8)+
+  annotate("text", x=8, y=48, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=12, y=48, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=16.5, y=48, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19.8, y=48, fontface="bold", label="Sep", size=8)+
+  geom_errorbar(aes(ymin=UnMean-UnMean.se, ymax=UnMean+DryMean.se), width=.5, position=position_dodge(width=0.4))+
+  geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
+  geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
+  scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
+  theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
+  theme(legend.position="None")+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 50), breaks=seq(0,50,10))+
+  ylab("Mean Light (klx)")+
+  annotate("text", x=1.1, y=48, fontface="bold", label="A", size=8, hjust=1)+
+  xlab("")
+
+p7<-ggplot(data=light.coef.com, aes(x=Week, y=DryMean, group=Sex))+
+  scale_x_discrete()+
+  theme_classic()+
+  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=3, y=77, fontface="bold", label="May", size=8)+
+  annotate("text", x=8, y=77, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=12, y=77, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=16.5, y=77, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19.8, y=77, fontface="bold", label="Sep", size=8)+
+  geom_errorbar(aes(ymin=DryMean-DryMean.se, ymax=DryMean+DryMean.se), width=.5, position=position_dodge(width=0.4))+
+  geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
+  geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
+  scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
+  theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.15, .25))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 80), breaks=seq(0,80,20))+
+  ylab("Mean Light (klx)")+
+  annotate("text", x=1.1, y=77, fontface="bold", label="C", size=8, hjust=1)+
+  xlab("Week")
+
+p8<-ggplot(data=light.coef.com, aes(x=Week, y=UnMedian, group=Sex))+
+  scale_x_discrete()+
+  theme_classic()+
+  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=3, y=48, fontface="bold", label="May", size=8)+
+  annotate("text", x=8, y=48, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=12, y=48, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=16.5, y=48, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19.8, y=48, fontface="bold", label="Sep", size=8)+
+  geom_errorbar(aes(ymin=UnMedian-UnMedian.se, ymax=UnMedian+UnMedian.se), width=.5, position=position_dodge(width=0.4))+
+  geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
+  geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
+  scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
+  theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
+  theme(legend.position="None")+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 50), breaks=seq(0,50,10))+
+  ylab("Median Light (klx)")+
+  annotate("text", x=1.1, y=48, fontface="bold", label="B", size=8, hjust=1)+
+  xlab("")
+
+p9<-ggplot(data=light.coef.com, aes(x=Week, y=DryMedian, group=Sex))+
+  scale_x_discrete()+
+  theme_classic()+
+  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=3, y=77, fontface="bold", label="May", size=8)+
+  annotate("text", x=8, y=77, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=12, y=77, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=16.5, y=77, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19.8, y=77, fontface="bold", label="Sep", size=8)+
+  geom_errorbar(aes(ymin=DryMedian-DryMedian.se, ymax=DryMedian+DryMedian.se), width=.5, position=position_dodge(width=0.4))+
+  geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
+  geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
+  scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
+  theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
+  theme(legend.position="None")+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 80), breaks=seq(0,80,20))+
+  ylab("Median Light (klx)")+
+  annotate("text", x=1.1, y=77, fontface="bold", label="D", size=8, hjust=1)+
+  xlab("Week")
+
+Fig1<-plot_grid(p6, p8,
+                p7, p9,
+                ncol = 2, scale=0.99)+
+  draw_label("Dry Only", size=28, fontface="bold", x=-0.03, y=0.25, vjust= 1.5, hjust=0.5, angle=90)+
+  draw_label("Full", size=28, fontface="bold", x=-0.03, y=0.75, vjust= 1.5, hjust=0, angle=90)+
+  theme(plot.margin = margin(6, 6, 6, 35, "pt"))
+ggsave("Fig1.jpg", plot=Fig1, width=19, height=9, path=path)
+
+# Figure 2- Proportion of time dry
+
+p10<-ggplot(data=light.coef.com, aes(x=Week, y=PropDry, group=Sex))+
+  scale_x_discrete()+
+  theme_classic()+
+  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=3, y=.95, fontface="bold", label="May", size=8)+
+  annotate("text", x=8, y=.95, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=12, y=.95, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=16.5, y=.95, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19.8, y=.95, fontface="bold", label="Sep", size=8)+
+  geom_errorbar(aes(ymin=PropDry-PropDry.se, ymax=PropDry+PropDry.se), width=.5, position=position_dodge(width=0.4))+
+  geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
+  geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
+  scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
+  theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.8, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks=seq(0,1,.25))+
+  ylab("Proportion of Day Dry")+
+  xlab("Week")
+#ggsave("Fig2.jpg", plot=p10, width=10, height=6, path=path)
+
+## Environmental correlations ----
+m6<-lmer(Mean.Light~CloudCover+(1|ID), data=Daily.Summary.Env.2021)
 summary(m6)
 anova(m6)
-fixef(m6)
-plot(Proportion.Dry~Discharge.ft.s, data=Daily.Summary.Env.2021)
-abline(a=2.947812e-01,b=(-1.535e-03*9.353e-05), col='red')
+m6.coef<-fixef(m6)
+plot(Mean.Light~CloudCover, data=Daily.Summary.Env.2021)
+abline(a=m6.coef[1],b=m6.coef[2], col='red')
 
+m7<-lmer(Mean.Light~Air.Mean.C+(1|ID), data=Dry.Daily.Summary.Env.2021)
+summary(m7)
+anova(m7)
+m7.coef<-fixef(m7)
+plot(Mean.Light~Air.Mean.C, data=Daily.Summary.Env.2021)
+abline(a=m7.coef[1],b=m7.coef[2], col='red')
 
+m8<-lmer(Mean.Light~Air.Min.C+(1|ID), data=Dry.Daily.Summary.Env.2021)
+summary(m8)
+anova(m8)
+m8.coef<-fixef(m8)
+plot(Mean.Light~Air.Min.C, data=Daily.Summary.Env.2021)
+abline(a=m8.coef[1],b=m8.coef[2], col='red')
 
+m9<-lmer(Proportion.Dry~Air.Min.C+(1|ID), data=Daily.Summary.Env.2021)
+summary(m9)
+anova(m9)
+m9.coef<-fixef(m9)
+plot(Proportion.Dry~Air.Min.C, data=Daily.Summary.Env.2021)
+abline(a=m9.coef[1],b=m9.coef[2], col='red')
 
 
 

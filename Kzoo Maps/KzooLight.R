@@ -1,4 +1,4 @@
-setwd("~/Desktop/Research/Side Projects/Turtle Light 2021/Turtle-Light/Kzoo Maps")
+setwd("~/Desktop/Research- PhD to Present/Side Projects/Turtle Light 2021/Turtle-Light/Kzoo Maps")
 ## Packages ----
 library(tidyr)
 library(tidyverse)
@@ -56,6 +56,8 @@ Marlo<-read.csv("Marlo.csv")
 Marlo$ID<-"Marlo"
 Marlo$sex<-"Female"
 Satan<-read.csv("Satan.csv")
+Satan1<-read.csv("Satan2.csv")
+Satan<-rbind(Satan,Satan1)
 Satan$ID<-"Satan"
 Satan$sex<-"Male"
 Ziggy<-read.csv("Ziggy.csv")
