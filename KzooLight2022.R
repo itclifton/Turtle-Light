@@ -53,7 +53,7 @@ Dale<-read.csv("DaleDone.csv")
 Dale$ID<-"Dale"
 Dale$sex<-"Male"
 Dale$datetime<-as.POSIXct(strptime(Dale$Adjusted.Local.Time, format("%Y-%m-%d %H:%M")))
-Dale<-subset(Dale, format(datetime, "%Y-%m-%d")<"2021-09-10" & format(datetime, "%Y-%m-%d")>"2021-05-04")
+Dale<-subset(Dale, format(datetime, "%Y-%m-%d")<"2021-07-02" & format(datetime, "%Y-%m-%d")>"2021-05-04")
 
 Dot<-read.csv("DotDone.csv")
 Dot$ID<-"Dot"
@@ -545,17 +545,16 @@ light.coef.com<-separate(light.coef.com, 'Week', paste("Week", 1:2, sep=""), sep
 light.coef.com<-light.coef.com[,-3]
 colnames(light.coef.com)[2]<-"Week"
 
-p6<-ggplot(data=light.coef.com, aes(x=Week, y=UnMean, group=Sex))+
-  scale_x_discrete()+
+p6<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=UnMean, group=Sex))+
   theme_classic()+
-  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=3, y=48, fontface="bold", label="May", size=8)+
-  annotate("text", x=8, y=48, fontface="bold", label="Jun", size=8)+
-  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=12, y=48, fontface="bold", label="Jul", size=8)+
-  annotate("text", x=16.5, y=48, fontface="bold", label="Aug", size=8)+
-  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=19.8, y=48, fontface="bold", label="Sep", size=8)+
+  annotate("rect", xmin=16, xmax=22, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19, y=48, fontface="bold", label="May", size=8)+
+  annotate("text", x=24, y=48, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=26, xmax=30, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=28, y=48, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=32.5, y=48, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=35, xmax=37, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=36, y=48, fontface="bold", label="Sep", size=8)+
   geom_errorbar(aes(ymin=UnMean-UnMean.se, ymax=UnMean+DryMean.se), width=.5, position=position_dodge(width=0.4))+
   geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
   geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
@@ -564,21 +563,21 @@ p6<-ggplot(data=light.coef.com, aes(x=Week, y=UnMean, group=Sex))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
   theme(legend.position="None")+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 50), breaks=seq(0,50,10))+
+  scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Mean Light (klx)")+
-  annotate("text", x=1.1, y=48, fontface="bold", label="A", size=8, hjust=1)+
+  annotate("text", x=16, y=48, fontface="bold", label="A", size=8, hjust=1)+
   xlab("")
 
-p7<-ggplot(data=light.coef.com, aes(x=Week, y=DryMean, group=Sex))+
-  scale_x_discrete()+
+p7<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=DryMean, group=Sex))+
   theme_classic()+
-  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=3, y=77, fontface="bold", label="May", size=8)+
-  annotate("text", x=8, y=77, fontface="bold", label="Jun", size=8)+
-  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=12, y=77, fontface="bold", label="Jul", size=8)+
-  annotate("text", x=16.5, y=77, fontface="bold", label="Aug", size=8)+
-  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=19.8, y=77, fontface="bold", label="Sep", size=8)+
+  annotate("rect", xmin=16, xmax=22, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19, y=77, fontface="bold", label="May", size=8)+
+  annotate("text", x=24, y=77, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=26, xmax=30, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=28, y=77, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=32.5, y=77, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=35, xmax=37, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=36, y=77, fontface="bold", label="Sep", size=8)+
   geom_errorbar(aes(ymin=DryMean-DryMean.se, ymax=DryMean+DryMean.se), width=.5, position=position_dodge(width=0.4))+
   geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
   geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
@@ -586,23 +585,23 @@ p7<-ggplot(data=light.coef.com, aes(x=Week, y=DryMean, group=Sex))+
   theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
         legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
-  theme(legend.position = c(.15, .25))+
+  theme(legend.position = c(.2, .22))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 80), breaks=seq(0,80,20))+
+  scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Mean Light (klx)")+
-  annotate("text", x=1.1, y=77, fontface="bold", label="C", size=8, hjust=1)+
+  annotate("text", x=16, y=77, fontface="bold", label="C", size=8, hjust=1)+
   xlab("Week")
 
-p8<-ggplot(data=light.coef.com, aes(x=Week, y=UnMedian, group=Sex))+
-  scale_x_discrete()+
+p8<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=UnMedian, group=Sex))+
   theme_classic()+
-  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=3, y=48, fontface="bold", label="May", size=8)+
-  annotate("text", x=8, y=48, fontface="bold", label="Jun", size=8)+
-  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=12, y=48, fontface="bold", label="Jul", size=8)+
-  annotate("text", x=16.5, y=48, fontface="bold", label="Aug", size=8)+
-  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=19.8, y=48, fontface="bold", label="Sep", size=8)+
+  annotate("rect", xmin=16, xmax=22, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19, y=48, fontface="bold", label="May", size=8)+
+  annotate("text", x=24, y=48, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=26, xmax=30, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=28, y=48, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=32.5, y=48, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=35, xmax=37, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=36, y=48, fontface="bold", label="Sep", size=8)+
   geom_errorbar(aes(ymin=UnMedian-UnMedian.se, ymax=UnMedian+UnMedian.se), width=.5, position=position_dodge(width=0.4))+
   geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
   geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
@@ -611,21 +610,21 @@ p8<-ggplot(data=light.coef.com, aes(x=Week, y=UnMedian, group=Sex))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
   theme(legend.position="None")+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 50), breaks=seq(0,50,10))+
+  scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Median Light (klx)")+
-  annotate("text", x=1.1, y=48, fontface="bold", label="B", size=8, hjust=1)+
+  annotate("text", x=16, y=48, fontface="bold", label="B", size=8, hjust=1)+
   xlab("")
 
-p9<-ggplot(data=light.coef.com, aes(x=Week, y=DryMedian, group=Sex))+
-  scale_x_discrete()+
+p9<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=DryMedian, group=Sex))+
   theme_classic()+
-  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=3, y=77, fontface="bold", label="May", size=8)+
-  annotate("text", x=8, y=77, fontface="bold", label="Jun", size=8)+
-  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=12, y=77, fontface="bold", label="Jul", size=8)+
-  annotate("text", x=16.5, y=77, fontface="bold", label="Aug", size=8)+
-  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=19.8, y=77, fontface="bold", label="Sep", size=8)+
+  annotate("rect", xmin=16, xmax=22, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19, y=77, fontface="bold", label="May", size=8)+
+  annotate("text", x=24, y=77, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=26, xmax=30, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=28, y=77, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=32.5, y=77, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=35, xmax=37, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=36, y=77, fontface="bold", label="Sep", size=8)+
   geom_errorbar(aes(ymin=DryMedian-DryMedian.se, ymax=DryMedian+DryMedian.se), width=.5, position=position_dodge(width=0.4))+
   geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
   geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
@@ -634,73 +633,270 @@ p9<-ggplot(data=light.coef.com, aes(x=Week, y=DryMedian, group=Sex))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
   theme(legend.position="None")+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 80), breaks=seq(0,80,20))+
+  scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Median Light (klx)")+
-  annotate("text", x=1.1, y=77, fontface="bold", label="D", size=8, hjust=1)+
+  annotate("text", x=16, y=77, fontface="bold", label="D", size=8, hjust=1)+
   xlab("Week")
 
 Fig1<-plot_grid(p6, p8,
                 p7, p9,
                 ncol = 2, scale=0.99)+
-  draw_label("Dry Only", size=28, fontface="bold", x=-0.03, y=0.25, vjust= 1.5, hjust=0.5, angle=90)+
+  draw_label("Dry Only", size=28, fontface="bold", x=-0.03, y=0.25, vjust= 1.5, hjust=0, angle=90)+
   draw_label("Full", size=28, fontface="bold", x=-0.03, y=0.75, vjust= 1.5, hjust=0, angle=90)+
   theme(plot.margin = margin(6, 6, 6, 35, "pt"))
-ggsave("Fig1.jpg", plot=Fig1, width=19, height=9, path=path)
+#ggsave("Fig1.jpg", plot=Fig1, width=19, height=9, path=path)
 
 # Figure 2- Proportion of time dry
 
-p10<-ggplot(data=light.coef.com, aes(x=Week, y=PropDry, group=Sex))+
-  scale_x_discrete()+
+p10<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=PropDry, group=Sex))+
   theme_classic()+
-  annotate("rect", xmin=.75, xmax=6, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=3, y=.95, fontface="bold", label="May", size=8)+
-  annotate("text", x=8, y=.95, fontface="bold", label="Jun", size=8)+
-  annotate("rect", xmin=10, xmax=14, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=12, y=.95, fontface="bold", label="Jul", size=8)+
-  annotate("text", x=16.5, y=.95, fontface="bold", label="Aug", size=8)+
-  annotate("rect", xmin=19, xmax=20.5, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
-  annotate("text", x=19.8, y=.95, fontface="bold", label="Sep", size=8)+
+  annotate("rect", xmin=16, xmax=22, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=19, y=.95, fontface="bold", label="May", size=8)+
+  annotate("text", x=24, y=.95, fontface="bold", label="Jun", size=8)+
+  annotate("rect", xmin=26, xmax=30, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=28, y=.95, fontface="bold", label="Jul", size=8)+
+  annotate("text", x=32.5, y=.95, fontface="bold", label="Aug", size=8)+
+  annotate("rect", xmin=35, xmax=37, ymin=-Inf, ymax=Inf, alpha=0.2, fill="gray")+
+  annotate("text", x=36, y=.95, fontface="bold", label="Sep", size=8)+
   geom_errorbar(aes(ymin=PropDry-PropDry.se, ymax=PropDry+PropDry.se), width=.5, position=position_dodge(width=0.4))+
   geom_line(aes(linetype=Sex, colour=Sex), position=position_dodge(w=0.4), size=1.25)+
   geom_point(aes(shape=Sex, colour=Sex), size=5, position=position_dodge(width=0.4))+
   scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
-  theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
         legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
-  theme(legend.position = c(.8, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks=seq(0,1,.25))+
+  scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Proportion of Day Dry")+
   xlab("Week")
 #ggsave("Fig2.jpg", plot=p10, width=10, height=6, path=path)
 
+## Look at each individual summarized for each day ----
+Daily.Summary.Env$Sum.Light<-Daily.Summary.Env$Sum.Light/1000
+Daily.Summary.Env$Mean.Light<-Daily.Summary.Env$Mean.Light/1000
+Daily.Summary.Env$Median.Light<-Daily.Summary.Env$Median.Light/1000
+
+levels(Daily.Summary.Env$ID)
+
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Alvin"))
+p11<-ggplot(data=subset(Daily.Summary.Env, ID=="Alvin"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="April"))
+# Left out a full year
+p12<-ggplot(data=subset(Daily.Summary.Env, ID=="April"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Betty"))
+p13<-ggplot(data=subset(Daily.Summary.Env, ID=="Betty"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Bugs"))
+p14<-ggplot(data=subset(Daily.Summary.Env, ID=="Bugs"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Carmen"))
+p15<-ggplot(data=subset(Daily.Summary.Env, ID=="Carmen"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Chip"))
+p16<-ggplot(data=subset(Daily.Summary.Env, ID=="Chip"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Dale"))
+p17<-ggplot(data=subset(Daily.Summary.Env, ID=="Dale"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Dot"))
+p18<-ggplot(data=subset(Daily.Summary.Env, ID=="Dot"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Elsa"))
+# Left out a full year
+p19<-ggplot(data=subset(Daily.Summary.Env, ID=="Elsa"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Felix"))
+p20<-ggplot(data=subset(Daily.Summary.Env, ID=="Felix"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Fiona"))
+p21<-ggplot(data=subset(Daily.Summary.Env, ID=="Fiona"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Granny"))
+p22<-ggplot(data=subset(Daily.Summary.Env, ID=="Granny"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Grouch"))
+p23<-ggplot(data=subset(Daily.Summary.Env, ID=="Grouch"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Hubert"))
+# Left out a full year
+p24<-ggplot(data=subset(Daily.Summary.Env, ID=="Hubert"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Marlo"))
+# Left out a full year
+p25<-ggplot(data=subset(Daily.Summary.Env, ID=="Marlo"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Satan"))
+p26<-ggplot(data=subset(Daily.Summary.Env, ID=="Satan"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+#plot(Mean.Light~Date, data=subset(Daily.Summary.Env, ID=="Ziggy"))
+# Left out a full year
+p27<-ggplot(data=subset(Daily.Summary.Env, ID=="Ziggy"), aes(x=Date, y=Mean.Light))+
+  theme_classic()+
+  geom_point(size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60), breaks=seq(0,60,10))+
+  ylab("Mean Light (klx)")+
+  xlab("Date")
+
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Alvin"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="April"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Betty"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Bugs"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Carmen"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Chip"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Dale"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Dot"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Elsa"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Felix"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Fiona"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Granny"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Grouch"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Hubert"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Marlo"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Satan"))
+plot(Proportion.Dry~Date, data=subset(Daily.Summary.Env, ID=="Ziggy"))
+
+
 ## Environmental correlations ----
-m6<-lmer(Mean.Light~CloudCover+(1|ID), data=Daily.Summary.Env.2021)
+## Get the daily mean for all turtles and compare that against environmental measures
+Pooled.Summary<-aggregate(cbind(Sum.Light,Mean.Light,Median.Light,Proportion.Dry,
+                                Water.Min,Water.Max,Water.Mean,Avg.Wind,CloudCover,Precip,Air.Max.C,Air.Min.C,Air.Mean.C,RiverHeight.ft,Discharge.ft.s)~
+                            Date, mean, data=Daily.Summary.Env.2021)
+Pooled.Summary$Sum.Light<-Pooled.Summary$Sum.Light/1000
+Pooled.Summary$Mean.Light<-Pooled.Summary$Mean.Light/1000
+Pooled.Summary$Median.Light<-Pooled.Summary$Median.Light/1000
+
+m6<-lm(Mean.Light~Water.Max, data=Pooled.Summary)
 summary(m6)
 anova(m6)
-m6.coef<-fixef(m6)
-plot(Mean.Light~CloudCover, data=Daily.Summary.Env.2021)
+m6.coef<-coef(m6)
+plot(Mean.Light~Air.Max.C, data=Pooled.Summary)
 abline(a=m6.coef[1],b=m6.coef[2], col='red')
 
-m7<-lmer(Mean.Light~Air.Mean.C+(1|ID), data=Dry.Daily.Summary.Env.2021)
-summary(m7)
-anova(m7)
-m7.coef<-fixef(m7)
-plot(Mean.Light~Air.Mean.C, data=Daily.Summary.Env.2021)
-abline(a=m7.coef[1],b=m7.coef[2], col='red')
+p28<-ggplot(data=Pooled.Summary, aes(x=Date, y=Proportion.Dry))+
+  theme_classic()+
+  geom_point(size=2)+
+  #geom_point(aes(x=Date, y=Water.Max), color="blue", size=2)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks=seq(0,1,.25))+
+  ylab("Mean Proportion of Day Dry")+
+  xlab("Date")
 
-m8<-lmer(Mean.Light~Air.Min.C+(1|ID), data=Dry.Daily.Summary.Env.2021)
-summary(m8)
-anova(m8)
-m8.coef<-fixef(m8)
-plot(Mean.Light~Air.Min.C, data=Daily.Summary.Env.2021)
-abline(a=m8.coef[1],b=m8.coef[2], col='red')
-
-m9<-lmer(Proportion.Dry~Air.Min.C+(1|ID), data=Daily.Summary.Env.2021)
-summary(m9)
-anova(m9)
-m9.coef<-fixef(m9)
-plot(Proportion.Dry~Air.Min.C, data=Daily.Summary.Env.2021)
-abline(a=m9.coef[1],b=m9.coef[2], col='red')
-
-
-
-                         
