@@ -285,11 +285,13 @@ colnames(Weekly.Summary)<-c('Sex','Week.Year','Sum.Light','Mean.Light','Median.L
                             'Median.Light.se','Proportion.Dry.se','Daylight.Minutes.se')
 
 # Mean light per week- unfiltered
-m1<-lmer(Mean.Light~Sex*Week.Year+(1|ID), data=Daily.Summary.Env.2021)
+m1<-lmer((Mean.Light/1000)~Sex*Week.Year+(1|ID), data=Daily.Summary.Env.2021)
 summary(m1)
 anova(m1)
 m1.em<-emmeans(m1, list(pairwise~Sex*Week.Year), adjust = "tukey")
 m1.coef<-as.data.frame(m1.em$`emmeans of Sex, Week.Year`)
+mean((Daily.Summary.Env.2021$Mean.Light)/1000)
+st.err((Daily.Summary.Env.2021$Mean.Light)/1000)
 
 m1.1<-lmer(Mean.Light~Week.Year+(1|ID), data=Daily.Summary.Env.2021)
 summary(m1.1)
@@ -329,6 +331,8 @@ summary(m2)
 anova(m2)
 m2.em<-emmeans(m2, list(pairwise~Sex*Week.Year), adjust = "tukey")
 m2.coef<-as.data.frame(m2.em$`emmeans of Sex, Week.Year`)
+mean((Daily.Summary.Env.2021$Median.Light)/1000)
+st.err((Daily.Summary.Env.2021$Median.Light)/1000)
 
 m2.1<-lmer(Median.Light~Week.Year+(1|ID), data=Daily.Summary.Env.2021)
 summary(m2.1)
@@ -368,6 +372,8 @@ summary(m3)
 anova(m3)
 m3.em<-emmeans(m3, list(pairwise~Sex*Week.Year), adjust = "tukey")
 m3.coef<-as.data.frame(m3.em$`emmeans of Sex, Week.Year`)
+mean(Daily.Summary.Env.2021$Proportion.Dry)
+st.err(Daily.Summary.Env.2021$Proportion.Dry)
 
 m3.1<-lmer(Proportion.Dry~Week.Year+(1|ID), data=Daily.Summary.Env.2021)
 summary(m3.1)
@@ -447,6 +453,8 @@ summary(m4)
 anova(m4)
 m4.em<-emmeans(m4, list(pairwise~Sex*Week.Year), adjust = "tukey")
 m4.coef<-as.data.frame(m4.em$`emmeans of Sex, Week.Year`)
+mean((Dry.Daily.Summary.Env.2021$Mean.Light)/1000)
+st.err((Dry.Daily.Summary.Env.2021$Mean.Light)/1000)
 
 m4.1<-lmer(Mean.Light~Week.Year+(1|ID), data=Dry.Daily.Summary.Env.2021)
 summary(m4.1)
@@ -486,6 +494,8 @@ summary(m5)
 anova(m5)
 m5.em<-emmeans(m5, list(pairwise~Sex*Week.Year), adjust = "tukey")
 m5.coef<-as.data.frame(m5.em$`emmeans of Sex, Week.Year`)
+mean((Dry.Daily.Summary.Env.2021$Median.Light)/1000)
+st.err((Dry.Daily.Summary.Env.2021$Median.Light)/1000)
 
 m5.1<-lmer(Median.Light~Week.Year+(1|ID), data=Dry.Daily.Summary.Env.2021)
 summary(m5.1)
@@ -566,6 +576,7 @@ p6<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=UnMean, group=Sex))+
   scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
   theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
   theme(legend.position="None")+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 50), breaks=seq(0,50,10))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
@@ -590,6 +601,7 @@ p7<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=DryMean, group=Sex))+
   theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
         legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
   theme(legend.position = c(.2, .22))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 80), breaks=seq(0,80,20))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
@@ -613,6 +625,7 @@ p8<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=UnMedian, group=Sex))+
   scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
   theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
   theme(legend.position="None")+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 50), breaks=seq(0,50,10))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
@@ -636,6 +649,7 @@ p9<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=DryMedian, group=Sex))
   scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
   theme(panel.grid.major=element_line(colour="#FFFFFF"),panel.grid.minor=element_line(colour="#FFFFFF"))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
   theme(legend.position="None")+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 80), breaks=seq(0,80,20))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
@@ -669,6 +683,7 @@ p10<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=PropDry, group=Sex))+
   scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
         legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
   theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks=seq(0,1,.25))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
@@ -929,222 +944,5 @@ ggplot(data=Daily.Yearlong, aes(x=Date, y=Water.Mean))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 30), breaks=seq(0,30,5))+
   scale_x_datetime(date_breaks="1 month", date_labels="%b")+
   ylab("Minimum Water Temperature (°C)")+
-  xlab("Date")
-
-## Environmental correlations ----
-## Get the daily mean for all turtles and compare that against environmental measures
-Pooled.Summary<-aggregate(cbind(Sum.Light,Mean.Light,Median.Light,Proportion.Dry,
-                                Water.Min,Water.Max,Water.Mean,Avg.Wind,CloudCover,Precip,Air.Max.C,Air.Min.C,Air.Mean.C,RiverHeight.ft,Discharge.ft.s)~
-                            Date, mean, data=Daily.Summary.Env.2021)
-Pooled.Summary$Sum.Light<-Pooled.Summary$Sum.Light/1000
-Pooled.Summary$Mean.Light<-Pooled.Summary$Mean.Light/1000
-Pooled.Summary$Median.Light<-Pooled.Summary$Median.Light/1000
-
-# Environmental Correlations
-EnvCorr<-Pooled.Summary[, c(6:16)]
-CorMat<-cor(EnvCorr)
-round(CorMat, 2)
-CorMat2<-rcorr(as.matrix(EnvCorr))
-corrplot(CorMat2$r, type="upper", order="hclust", 
-         p.mat=CorMat2$P, sig.level=0.05, insig="blank")
-
-EnvCorr.pca<-prcomp(EnvCorr)
-summary(EnvCorr.pca)
-ggbiplot(EnvCorr.pca)
-## Mean Light
-m6<-lm(Mean.Light~Water.Min, data=Pooled.Summary)
-summary(m6)
-anova(m6)
-m6.coef<-coef(m6)
-plot(Mean.Light~Water.Min, data=Pooled.Summary)
-abline(a=m6.coef[1],b=m6.coef[2], col='red')
-
-m7<-lm(Mean.Light~Water.Max, data=Pooled.Summary)
-summary(m7)
-anova(m7)
-m7.coef<-coef(m7)
-plot(Mean.Light~Water.Max, data=Pooled.Summary)
-abline(a=m7.coef[1],b=m7.coef[2], col='red')
-
-m8<-lm(Mean.Light~Water.Mean, data=Pooled.Summary)
-summary(m8)
-anova(m8)
-m8.coef<-coef(m8)
-plot(Mean.Light~Water.Mean, data=Pooled.Summary)
-abline(a=m8.coef[1],b=m8.coef[2], col='red')
-
-m9<-lm(Mean.Light~Avg.Wind, data=Pooled.Summary)
-summary(m9)
-anova(m9)
-m9.coef<-coef(m9)
-plot(Mean.Light~Avg.Wind, data=Pooled.Summary)
-abline(a=m9.coef[1],b=m9.coef[2], col='red')
-
-m10<-lm(Mean.Light~CloudCover, data=Pooled.Summary)
-summary(m10)
-anova(m10)
-m10.coef<-coef(m10)
-plot(Mean.Light~CloudCover, data=Pooled.Summary)
-abline(a=m10.coef[1],b=m10.coef[2], col='red')
-
-m11<-lm(Mean.Light~Precip, data=Pooled.Summary)
-summary(m11)
-anova(m11)
-m11.coef<-coef(m11)
-plot(Mean.Light~Precip, data=Pooled.Summary)
-abline(a=m11.coef[1],b=m11.coef[2], col='red')
-
-m12<-lm(Mean.Light~Air.Max.C, data=Pooled.Summary)
-summary(m12)
-anova(m12)
-m12.coef<-coef(m12)
-plot(Mean.Light~Air.Max.C, data=Pooled.Summary)
-abline(a=m12.coef[1],b=m12.coef[2], col='red')
-
-m13<-lm(Mean.Light~Air.Min.C, data=Pooled.Summary)
-summary(m13)
-anova(m13)
-m13.coef<-coef(m13)
-plot(Mean.Light~Air.Min.C, data=Pooled.Summary)
-abline(a=m13.coef[1],b=m13.coef[2], col='red')
-
-m14<-lm(Mean.Light~Air.Mean.C, data=Pooled.Summary)
-summary(m14)
-anova(m14)
-m14.coef<-coef(m14)
-plot(Mean.Light~Air.Mean.C, data=Pooled.Summary)
-abline(a=m14.coef[1],b=m14.coef[2], col='red')
-
-m15<-lm(Mean.Light~RiverHeight.ft, data=Pooled.Summary)
-summary(m15)
-anova(m15)
-m15.coef<-coef(m15)
-plot(Mean.Light~RiverHeight.ft, data=Pooled.Summary)
-abline(a=m15.coef[1],b=m15.coef[2], col='red')
-
-m16<-lm(Mean.Light~Discharge.ft.s, data=Pooled.Summary)
-summary(m16)
-anova(m16)
-m16.coef<-coef(m16)
-plot(Mean.Light~Discharge.ft.s, data=Pooled.Summary)
-abline(a=m16.coef[1],b=m16.coef[2], col='red')
-
-# AIC Models- Mean Light
-aic1<-lm(Mean.Light~Water.Min+Water.Max+Water.Mean+Avg.Wind+CloudCover+Precip
-        +Air.Max.C+Air.Min.C+Air.Mean.C+RiverHeight.ft+Discharge.ft.s,
-        data=Pooled.Summary)
-summary(aic1)
-anova(aic1)
-AIC(aic1)
-
-aic2<-lm(Mean.Light~Water.Min+Water.Max+Water.Mean+
-         +Air.Max.C+Air.Min.C+Air.Mean.C+Discharge.ft.s,
-         data=Pooled.Summary)
-summary(aic2)
-anova(aic2)
-AIC(aic2)
-
-## Proportion of Day Dry
-m17<-lm(Proportion.Dry~Water.Min, data=Pooled.Summary)
-summary(m17)
-anova(m17)
-m17.coef<-coef(m17)
-plot(Proportion.Dry~Water.Min, data=Pooled.Summary)
-abline(a=m17.coef[1],b=m17.coef[2], col='red')
-
-m18<-lm(Proportion.Dry~Water.Max, data=Pooled.Summary)
-summary(m18)
-anova(m18)
-m18.coef<-coef(m18)
-plot(Proportion.Dry~Water.Max, data=Pooled.Summary)
-abline(a=m18.coef[1],b=m18.coef[2], col='red')
-
-m19<-lm(Proportion.Dry~Water.Mean, data=Pooled.Summary)
-summary(m19)
-anova(m19)
-m19.coef<-coef(m19)
-plot(Proportion.Dry~Water.Mean, data=Pooled.Summary)
-abline(a=m19.coef[1],b=m19.coef[2], col='red')
-
-m20<-lm(Proportion.Dry~Avg.Wind, data=Pooled.Summary)
-summary(m20)
-anova(m20)
-m20.coef<-coef(m20)
-plot(Proportion.Dry~Avg.Wind, data=Pooled.Summary)
-abline(a=m20.coef[1],b=m20.coef[2], col='red')
-
-m21<-lm(Proportion.Dry~CloudCover, data=Pooled.Summary)
-summary(m21)
-anova(m21)
-m21.coef<-coef(m21)
-plot(Proportion.Dry~CloudCover, data=Pooled.Summary)
-abline(a=m21.coef[1],b=m21.coef[2], col='red')
-
-m22<-lm(Proportion.Dry~Precip, data=Pooled.Summary)
-summary(m22)
-anova(m22)
-m22.coef<-coef(m22)
-plot(Proportion.Dry~Precip, data=Pooled.Summary)
-abline(a=m22.coef[1],b=m22.coef[2], col='red')
-
-m23<-lm(Proportion.Dry~Air.Max.C, data=Pooled.Summary)
-summary(m23)
-anova(m23)
-m23.coef<-coef(m23)
-plot(Proportion.Dry~Air.Max.C, data=Pooled.Summary)
-abline(a=m23.coef[1],b=m23.coef[2], col='red')
-
-m24<-lm(Proportion.Dry~Air.Min.C, data=Pooled.Summary)
-summary(m24)
-anova(m24)
-m24.coef<-coef(m24)
-plot(Proportion.Dry~Air.Min.C, data=Pooled.Summary)
-abline(a=m24.coef[1],b=m24.coef[2], col='red')
-
-m25<-lm(Proportion.Dry~Air.Mean.C, data=Pooled.Summary)
-summary(m25)
-anova(m25)
-m25.coef<-coef(m25)
-plot(Proportion.Dry~Air.Mean.C, data=Pooled.Summary)
-abline(a=m25.coef[1],b=m25.coef[2], col='red')
-
-m26<-lm(Proportion.Dry~RiverHeight.ft, data=Pooled.Summary)
-summary(m26)
-anova(m26)
-m26.coef<-coef(m26)
-plot(Proportion.Dry~RiverHeight.ft, data=Pooled.Summary)
-abline(a=m26.coef[1],b=m26.coef[2], col='red')
-
-m27<-lm(Proportion.Dry~Discharge.ft.s, data=Pooled.Summary)
-summary(m27)
-anova(m27)
-m27.coef<-coef(m27)
-plot(Proportion.Dry~Discharge.ft.s, data=Pooled.Summary)
-abline(a=m27.coef[1],b=m27.coef[2], col='red')
-
-# AIC models- Proportion Dry
-aic3<-lm(Proportion.Dry~Water.Min+Water.Max+Water.Mean+Avg.Wind+CloudCover+Precip
-         +Air.Max.C+Air.Min.C+Air.Mean.C+RiverHeight.ft+Discharge.ft.s,
-         data=Pooled.Summary)
-summary(aic3)
-anova(aic3)
-AIC(aic3)
-
-aic4<-lm(Proportion.Dry~Water.Min+Water.Max+Water.Mean+
-           +Air.Max.C+Air.Min.C+Air.Mean.C+Discharge.ft.s,
-         data=Pooled.Summary)
-summary(aic4)
-anova(aic4)
-AIC(aic4)
-
-p28<-ggplot(data=Pooled.Summary, aes(x=Date, y=Proportion.Dry))+
-  theme_classic()+
-  geom_point(size=2)+
-  #geom_point(aes(x=Date, y=Water.Max), color="blue", size=2)+
-  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
-        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
-  theme(legend.position = c(.75, .7), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks=seq(0,1,.25))+
-  ylab("Mean Proportion of Day Dry")+
   xlab("Date")
 
