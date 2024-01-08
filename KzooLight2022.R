@@ -14,6 +14,7 @@ library(corrplot)
 library(MuMIn)
 library(devtools)
 library(ggbiplot)
+library(patchwork)
 st.err = function(x) {sd(x)/sqrt(length(x))}
 path<-"/Users/ianclifton/Desktop/Research- PhD to Present/Side Projects/Turtle Light 2021/Figures"
 
@@ -58,7 +59,8 @@ Dale<-read.csv("DaleDone.csv")
 Dale$ID<-"Dale"
 Dale$sex<-"Male"
 Dale$datetime<-as.POSIXct(strptime(Dale$Adjusted.Local.Time, format("%Y-%m-%d %H:%M")))
-Dale<-subset(Dale, format(datetime, "%Y-%m-%d")<"2021-07-02" & format(datetime, "%Y-%m-%d")>"2021-05-04")
+# Dale<-subset(Dale, format(datetime, "%Y-%m-%d")<"2021-07-02" & format(datetime, "%Y-%m-%d")>"2021-05-04")
+Dale<-subset(Dale, format(datetime, "%Y-%m-%d")<"2021-09-10" & format(datetime, "%Y-%m-%d")>"2021-05-04")
 
 Dot<-read.csv("DotDone.csv")
 Dot$ID<-"Dot"
@@ -285,7 +287,7 @@ colnames(Weekly.Summary)<-c('Sex','Week.Year','Sum.Light','Mean.Light','Median.L
                             'Median.Light.se','Proportion.Dry.se','Daylight.Minutes.se')
 
 # Mean light per week- unfiltered
-m1<-lmer((Mean.Light/1000)~Sex*Week.Year+(1|ID), data=Daily.Summary.Env.2021)
+m1<-lmer(Mean.Light~Sex*Week.Year+(1|ID), data=Daily.Summary.Env.2021)
 summary(m1)
 anova(m1)
 m1.em<-emmeans(m1, list(pairwise~Sex*Week.Year), adjust = "tukey")
@@ -602,11 +604,11 @@ p7<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=DryMean, group=Sex))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
         legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
   theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
-  theme(legend.position = c(.2, .22))+
+  theme(legend.position = c(.19, .18))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 80), breaks=seq(0,80,20))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Mean Light (klx)")+
-  annotate("text", x=16, y=77, fontface="bold", label="C", size=8, hjust=1)+
+  annotate("text", x=16, y=77, fontface="bold", label="B", size=8, hjust=1)+
   xlab("Week")
 
 p8<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=UnMedian, group=Sex))+
@@ -683,10 +685,11 @@ p10<-ggplot(data=light.coef.com, aes(x=as.numeric(Week), y=PropDry, group=Sex))+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
         legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
   theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
-  theme(legend.position = c(.75, .55), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  theme(legend.position = c(.76, .6), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 1), breaks=seq(0,1,.25))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Proportion of Day Dry")+
+  annotate("text", x=16, y=.95, fontface="bold", label="B", size=8, hjust=1)+
   xlab("Week")
 #ggsave("Fig2.jpg", plot=p10, width=10, height=6, path=path)
 
@@ -957,8 +960,13 @@ ggplot(data=Weekly.Env.21, aes(x=as.numeric(Week), y=Air.Mean.C))+
   xlab("Date")
 
 ## Environmental Plot
-Daily.Summary.Env.2021$Week<-as.factor(strftime(Daily.Summary.Env.2021$Date,format="%W"))
-Weekly.Env.21<-aggregate(cbind(Water.Mean,Air.Mean.C)~Week, mean, data=Daily.Summary.Env.2021)
+Env.data.1<-aggregate(cbind(Water.Mean,Air.Mean.C)~format(Date, "%Y-%m-%d"), max, data=Env.data)
+colnames(Env.data.1)<-c("Date","Water.Mean","Air.Mean.C")
+Env.data.1$Date<-as.POSIXct(strptime(Env.data.1$Date, format("%Y-%m-%d")))
+Env.data.1<-subset(Env.data.1, format(Date, "%Y-%m-%d")<"2021-09-10")
+Env.data.1<-droplevels(Env.data.1)
+Env.data.1$Week<-as.factor(strftime(Env.data.1$Date,format="%W"))
+Weekly.Env.21<-aggregate(cbind(Water.Mean,Air.Mean.C)~Week, mean, data=Env.data.2021)
 
 p28<-ggplot(data=Weekly.Env.21, aes(x=as.numeric(as.character(Week))))+
   theme_classic()+
@@ -980,6 +988,7 @@ p28<-ggplot(data=Weekly.Env.21, aes(x=as.numeric(as.character(Week))))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 30), breaks=seq(0,30,5))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Mean Temperature (°C)")+
+  annotate("text", x=16, y=29, fontface="bold", label="A", size=8, hjust=1)+
   xlab("Week")
 #ggsave("TempFig.jpg", plot=p28, width=10, height=6, path=path)
 
@@ -1020,10 +1029,11 @@ p29<-ggplot(data=m28.coef, aes(x=as.numeric(as.character(Week)), y=emmean, group
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
         legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
   theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
-  theme(legend.position = c(.75, .75), plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  theme(legend.position = "", plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
   scale_y_continuous(expand = c(0, 0), limits = c(0, 16), breaks=seq(0,16,4))+
   scale_x_continuous(limits = c(16, 37), breaks=seq(17,36,2))+
   ylab("Number of State Changes")+
+  annotate("text", x=16, y=15, fontface="bold", label="C", size=8, hjust=1)+
   xlab("Week")
 #ggsave("StateChangeFig.jpg", plot=p29, width=10, height=6, path=path)
 
@@ -1036,44 +1046,62 @@ getmode <- function(v) {
   uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
-DailyBasking<-aggregate(WetDry~ID+sex+format(datetime, "%Y-%m-%d %H"), getmode, data=Turtles.Day)
-colnames(DailyBasking)<-c("ID","sex","datetime","WetDry")
+DailyBasking<-aggregate(Light~format(datetime, "%Y-%m-%d %H")+ID, max, data=Turtles.Day)
+colnames(DailyBasking)<-c("datetime","ID","Light")
 DailyBasking$datetime<-as.POSIXct(strptime(DailyBasking$datetime, format("%Y-%m-%d %H")))
+DailyBasking<-subset(DailyBasking, format(datetime, "%Y-%m-%d")<"2021-09-10")
 DailyBasking$Hour<-as.numeric(format(DailyBasking$datetime, "%H"))
+DailyBasking$Week<-as.numeric(format(DailyBasking$datetime, "%W"))
+test<-aggregate(Light~Week+Hour, mean, data=DailyBasking)
+aggregate(WetDry~Hour+Week, max, data=test)
+## find the peak basking time for each turtle each day. Compare that peak across the season?
+glm1<-lmer(Light~as.factor(Hour)+as.factor(Week)+(1|ID), data=DailyBasking)
+summary(glm1)
 
 DailyBasking.sex<-aggregate(WetDry~sex+format(datetime, "%Y-%m-%d %H"), getmode, data=DailyBasking)
 colnames(DailyBasking.sex)<-c("sex","datetime","WetDry")
 DailyBasking.sex$datetime<-as.POSIXct(strptime(DailyBasking.sex$datetime, format("%Y-%m-%d %H")))
 
-Rep.May.5<-subset(DailyBasking.sex, format(datetime, "%Y-%m-%d %H")<"2021-05-05 20" & format(datetime, "%Y-%m-%d %H")>"2021-05-05 05")
+Rep.May.5<-subset(DailyBasking, format(datetime, "%Y-%m-%d %H")<"2021-05-05 20" & format(datetime, "%Y-%m-%d %H")>"2021-05-05 05")
 Rep.May.5$Hour<-as.numeric(format(Rep.May.5$datetime, "%H"))
 
-Rep.May.28<-subset(DailyBasking.sex, format(datetime, "%Y-%m-%d %H")<"2021-05-28 20" & format(datetime, "%Y-%m-%d %H")>"2021-05-28 05")
+Rep.May.28<-subset(DailyBasking, format(datetime, "%Y-%m-%d %H")<"2021-05-28 20" & format(datetime, "%Y-%m-%d %H")>"2021-05-28 05")
 Rep.May.28$Hour<-as.numeric(format(Rep.May.28$datetime, "%H"))
 
-Rep.June.5<-subset(DailyBasking.sex, format(datetime, "%Y-%m-%d %H")<"2021-06-05 20" & format(datetime, "%Y-%m-%d %H")>"2021-06-05 05")
+Rep.June.5<-subset(DailyBasking, format(datetime, "%Y-%m-%d %H")<"2021-06-05 20" & format(datetime, "%Y-%m-%d %H")>"2021-06-05 05")
 Rep.June.5$Hour<-as.numeric(format(Rep.June.5$datetime, "%H"))
 
-Rep.June.28<-subset(DailyBasking.sex, format(datetime, "%Y-%m-%d %H")<"2021-06-28 20" & format(datetime, "%Y-%m-%d %H")>"2021-06-28 05")
+Rep.June.28<-subset(DailyBasking, format(datetime, "%Y-%m-%d %H")<"2021-06-28 20" & format(datetime, "%Y-%m-%d %H")>"2021-06-28 05")
 Rep.June.28$Hour<-as.numeric(format(Rep.June.28$datetime, "%H"))
 
-Rep.July.5<-subset(DailyBasking.sex, format(datetime, "%Y-%m-%d %H")<"2021-07-05 20" & format(datetime, "%Y-%m-%d %H")>"2021-07-05 05")
+Rep.July.5<-subset(DailyBasking, format(datetime, "%Y-%m-%d %H")<"2021-07-05 20" & format(datetime, "%Y-%m-%d %H")>"2021-07-05 05")
 Rep.July.5$Hour<-as.numeric(format(Rep.July.5$datetime, "%H"))
 
-Rep.July.28<-subset(DailyBasking.sex, format(datetime, "%Y-%m-%d %H")<"2021-07-28 20" & format(datetime, "%Y-%m-%d %H")>"2021-07-28 05")
+Rep.July.28<-subset(DailyBasking, format(datetime, "%Y-%m-%d %H")<"2021-07-28 20" & format(datetime, "%Y-%m-%d %H")>"2021-07-28 05")
 Rep.July.28$Hour<-as.numeric(format(Rep.July.28$datetime, "%H"))
 
-Rep.Aug.5<-subset(DailyBasking.sex, format(datetime, "%Y-%m-%d %H")<"2021-08-05 20" & format(datetime, "%Y-%m-%d %H")>"2021-08-05 05")
+Rep.Aug.5<-subset(DailyBasking, format(datetime, "%Y-%m-%d %H")<"2021-08-05 20" & format(datetime, "%Y-%m-%d %H")>"2021-08-05 05")
 Rep.Aug.5$Hour<-as.numeric(format(Rep.Aug.5$datetime, "%H"))
 
-Rep.Aug.28<-subset(DailyBasking.sex, format(datetime, "%Y-%m-%d %H")<"2021-08-28 20" & format(datetime, "%Y-%m-%d %H")>"2021-08-28 05")
+Rep.Aug.28<-subset(DailyBasking, format(datetime, "%Y-%m-%d %H")<"2021-08-28 20" & format(datetime, "%Y-%m-%d %H")>"2021-08-28 05")
 Rep.Aug.28$Hour<-as.numeric(format(Rep.Aug.28$datetime, "%H"))
 
-ggplot(data=Rep.Aug.28, aes(x=Hour, y=WetDry))+
+a1<-ggplot(data=test, aes(x=Hour, y=Light, group=Week))+
   theme_classic()+
-  geom_line(aes(linetype=sex, colour=sex), position=position_dodge(w=0.4), size=1.25)+
-  geom_point(aes(shape=sex, colour=sex), size=5, position=position_dodge(width=0.4))+
-  scale_color_manual(values=c('#ABABAB','#5E5E5E'))+
+  geom_line(aes(colour=Week), size=1.25)+
+  scale_colour_gradient(low = "blue", high = "red", breaks=c(17, 21, 25, 29, 33, 37), limits=c(17, 37))+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
+  theme(legend.position = "bottom", legend.key.size=unit(1, 'cm'),
+        plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 75000), breaks=seq(0,75000,15000))+
+  scale_x_continuous(limits = c(6, 20), breaks=seq(6,20,2))+
+  ylab("")+
+  xlab("Hour")
+a2<-ggplot(data=Rep.May.28, aes(x=Hour, y=WetDry))+
+  theme_classic()+
+  geom_line(size=1.25)+
   theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
         legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
   theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
@@ -1082,5 +1110,99 @@ ggplot(data=Rep.Aug.28, aes(x=Hour, y=WetDry))+
   scale_x_continuous(limits = c(6, 20), breaks=seq(6,20,2))+
   ylab("")+
   xlab("Hour")
+a3<-ggplot(data=Rep.June.5, aes(x=Hour, y=WetDry))+
+  theme_classic()+
+  geom_line(size=1.25)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
+  theme(legend.position = "bottom", plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1.005), breaks=seq(0,1,.25))+
+  scale_x_continuous(limits = c(6, 20), breaks=seq(6,20,2))+
+  ylab("")+
+  xlab("Hour")
+a4<-ggplot(data=Rep.June.28, aes(x=Hour, y=WetDry))+
+  theme_classic()+
+  geom_line(size=1.25)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
+  theme(legend.position = "bottom", plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1.005), breaks=seq(0,1,.25))+
+  scale_x_continuous(limits = c(6, 20), breaks=seq(6,20,2))+
+  ylab("")+
+  xlab("Hour")
+a5<-ggplot(data=Rep.July.5, aes(x=Hour, y=WetDry))+
+  theme_classic()+
+  geom_line(size=1.25)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
+  theme(legend.position = "bottom", plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1.005), breaks=seq(0,1,.25))+
+  scale_x_continuous(limits = c(6, 20), breaks=seq(6,20,2))+
+  ylab("")+
+  xlab("Hour")
+a6<-ggplot(data=Rep.July.28
+           , aes(x=Hour, y=WetDry))+
+  theme_classic()+
+  geom_line(size=1.25)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
+  theme(legend.position = "bottom", plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1.005), breaks=seq(0,1,.25))+
+  scale_x_continuous(limits = c(6, 20), breaks=seq(6,20,2))+
+  ylab("")+
+  xlab("Hour")
+a7<-ggplot(data=Rep.Aug.5, aes(x=Hour, y=WetDry))+
+  theme_classic()+
+  geom_line(size=1.25)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
+  theme(legend.position = "bottom", plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1.005), breaks=seq(0,1,.25))+
+  scale_x_continuous(limits = c(6, 20), breaks=seq(6,20,2))+
+  ylab("")+
+  xlab("Hour")
+a8<-ggplot(data=Rep.Aug.28, aes(x=Hour, y=WetDry))+
+  theme_classic()+
+  geom_line(size=1.25)+
+  theme(axis.text=element_text(size=20,face="bold"), axis.title=element_text(size=22,face="bold"),
+        legend.text=element_text(size=22, face="bold"), legend.title=element_text(size=25, face="bold", hjust=0.5))+
+  theme(axis.ticks.length.y=unit(.5, "cm"), axis.ticks.y=element_line(size=1.75), axis.line=element_line(size=1.75))+
+  theme(legend.position = "bottom", plot.margin = margin(11, 5.5, 5.5, 5.5, "pt"))+
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1.005), breaks=seq(0,1,.25))+
+  scale_x_continuous(limits = c(6, 20), breaks=seq(6,20,2))+
+  ylab("")+
+  xlab("Hour")
+
+## Summary of observations- Table 1 ----
+a<-subset(Turtles, format(datetime, "%Y-%m-%d")<"2021-09-10")
+a<-na.omit(a)
+a<-droplevels(a)
+a.1<-aggregate(Light~ID, length, data=subset(a, sex=="Male"))
+sum(a.1$Light)
+a.2<-aggregate(Light~ID, length, data=subset(a, sex=="Female"))
+sum(a.2$Light)
+aggregate(format(date, "%Y-%m-%d")~sex+ID, range, data=subset(a, sex=="Male"))
+aggregate(format(date, "%Y-%m-%d")~sex+ID, range, data=subset(a, sex=="Female"))
+b<-subset(Turtles.Day, format(datetime, "%Y-%m-%d")<"2021-09-10")
+sum(Shuttling$StateChange)
+
+## Updated Figures after review 1/7 ----
+Fig3.1<-plot_grid(p6,p7,
+                ncol = 1, scale=0.99)+
+  draw_label("Dry Only", size=28, fontface="bold", x=-0.05, y=0.25, vjust= 1.5, hjust=0, angle=90)+
+  draw_label("Full", size=28, fontface="bold", x=-0.05, y=0.75, vjust= 1.5, hjust=0, angle=90)+
+  theme(plot.margin = margin(6, 6, 6, 35, "pt"))
+#ggsave("Fig3.1.jpg", plot=Fig3.1, width=9.5, height=9, path=path)
+
+Fig4.2<-plot_grid(p28, p10, p29,
+                  ncol = 1, scale=0.99)+
+  theme(plot.margin = margin(6, 6, 6, 35, "pt"))
+#ggsave("Fig4.2.jpg", plot=Fig4.2, width=9.5, height=12, path=path)
+
 
 
